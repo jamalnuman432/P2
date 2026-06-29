@@ -12,8 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 // MongoDB Atlas connection pointing to database M1 with your credentials
-const mongoURI = "mongodb+srv://jamal:123@cluster0.yourRealCode.mongodb.net/M1?retryWrites=true&w=majority";
-
+const mongoURI = "mongodb+srv://jamal:123@cluster0.ec5qpip.mongodb.net/M1?retryWrites=true&w=majority";
 mongoose.connect(mongoURI)
     .then(() => console.log("Connected to MongoDB Atlas (Database: M1)"))
     .catch(err => console.error("Database connection error:", err));
