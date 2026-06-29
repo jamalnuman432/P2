@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Form</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 600px; }
+        h2 { text-align: center; color: #333; margin-bottom: 30px; font-weight: 600; }
+        
+        /* Side-by-side row alignment layout */
+        .form-row { display: flex; align-items: center; margin-bottom: 20px; }
+        .form-row label { width: 30%; color: #555; font-weight: 500; font-size: 15px; }
+        .form-row input, .form-row select { width: 70%; padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9; font-size: 15px; transition: all 0.3s ease; outline: none; }
+        .form-row input:focus, .form-row select:focus { border-color: #4a90e2; background-color: #fff; box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1); }
+        
+        button { width: 100%; padding: 14px; background: #4a90e2; border: none; color: white; font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
+        button:hover { background: #357abd; }
+        .msg { text-align: center; margin-top: 15px; font-weight: 500; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Personal Information</h2>
+    <form id="appForm">
+        <div class="form-row">
+            <label for="name">Name</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="form-row">
+            <label for="organization">Organization</label>
+            <input type="text" id="organization" required>
+        </div>
+        <div class="form-row">
+            <label for="age">Age</label>
+            <input type="number" id="age" required min="1">
+        </div>
+        <div class="form-row">
+            <label for="certificate">Certificate</label>
+            <select id="certificate" required>
+                <option value="" disabled selected>Select Certificate</option>
+                <option value="PhD">PhD</option>
+                <option value="MSc">MSc</option>
+                <option value="Bsc">Bsc</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <button type="submit">Submit Information</button>
+        <div id="message" class="msg"></div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('appForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgDiv = document.getElementById('message');
+        const payload = {
+            name: document.getElementById('name').value,
+            organization: document.getElementById('organization').value,
+            age: document.getElementById('age').value,
+            certificate: document.getElementById('certificate').value
+        };
+
+        try {
+            const res = await fetch('/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if(data.success) {
+                msgDiv.style.color = '#2ecc71';
+                msgDiv.innerText = data.message;
+                document.getElementById('appForm').reset();
+            } else {
+                msgDiv.style.color = '#e74c3c';
+                msgDiv.innerText = "Submission failed.";
+            }
+        } catch {
+            msgDiv.style.color = '#e74c3c';
+            msgDiv.innerText = "Error linking to backend server.";
+        }
+        msgDiv.style.display = 'block';
+    });
+</script>
+</body>
+</html>
