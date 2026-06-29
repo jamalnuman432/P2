@@ -5,43 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f4f6f9; color: #333; min-height: 100vh; padding: 40px 20px; display: flex; justify-content: center; }
-        .wrapper { width: 100%; max-width: 900px; }
-        .login-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); max-width: 400px; margin: 100px auto; width: 100%; }
-        h2 { text-align: center; margin-bottom: 24px; color: #4a90e2; }
-        .form-row { display: flex; align-items: center; margin-bottom: 15px; }
-        .form-row label { width: 30%; font-weight: 500; }
-        .form-row input { width: 70%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-        button { width: 100%; padding: 12px; background: #4a90e2; border: none; color: white; font-weight: 600; border-radius: 6px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #357abd; }
-        
-        .dashboard { display: none; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; padding: 40px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 900px; }
+        h2 { margin-bottom: 20px; color: #333; text-align: center; }
+        .login-box { max-width: 400px; margin: 50px auto; text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .login-box button { width: 100%; padding: 12px; background: #4a90e2; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .dashboard { display: none; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; color: #666; font-weight: 600; }
-        tr:hover { background-color: #fcfcfc; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
+        th { background: #4a90e2; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .error-msg { color: red; margin-top: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="login-box" id="loginBox">
-        <h2>Admin Portal</h2>
-        <form id="loginForm">
-            <div class="form-row">
-                <label>User</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="form-row">
-                <label>Password</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
+<div class="container">
+    <div id="loginSection" class="login-box">
+        <h2>Admin Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="loginBtn">Login</button>
+        <p id="loginError" class="error-msg"></p>
     </div>
 
-    <div class="dashboard" id="dashboardBox">
+    <div id="dashboardSection" class="dashboard">
         <h2>Submitted Applications</h2>
         <table>
             <thead>
@@ -49,50 +39,51 @@
                     <th>Name</th>
                     <th>Organization</th>
                     <th>Age</th>
+                    <th>City</th>
                     <th>Certificate</th>
                 </tr>
             </thead>
-            <tbody id="dataTable">
-                </tbody>
+            <tbody id="dataTable"></tbody>
         </table>
     </div>
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const errorP = document.getElementById('loginError');
 
         try {
             const res = await fetch('/api/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username: u, password: p })
             });
             const result = await res.json();
 
-            if(result.success) {
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('dashboardBox').style.display = 'block';
+            if (result.success) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('dashboardSection').style.display = 'block';
                 
                 const tbody = document.getElementById('dataTable');
                 tbody.innerHTML = '';
-                result.data.forEach(item => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${item.name}</td>
-                            <td>${item.organization}</td>
-                            <td>${item.age}</td>
-                            <td>${item.certificate}</td>
-                        </tr>
+                result.data.forEach(app => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${app.name}</td>
+                        <td>${app.organization}</td>
+                        <td>${app.age}</td>
+                        <td>${app.city || 'N/A'}</td>
+                        <td>${app.certificate}</td>
                     `;
+                    tbody.appendChild(row);
                 });
             } else {
-                alert(result.message);
+                errorP.textContent = "Invalid login details.";
             }
-        } catch {
-            alert('Error contacting server.');
+        } catch (err) {
+            errorP.textContent = "An error occurred during login.";
         }
     });
 </script>
