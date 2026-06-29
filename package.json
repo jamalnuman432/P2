@@ -1,13 +1,13 @@
 {
-  "name": "m1-application-app",
+  "name": "p2-applicant-form",
   "version": "1.0.0",
-  "description": "Flat directory application setup inside C root folder",
+  "description": "Form application tracking database metrics",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "mongoose": "^8.3.1"
+    "mongoose": "^8.4.1"
   }
 }
