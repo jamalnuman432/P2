@@ -23,6 +23,7 @@ const applicantSchema = new mongoose.Schema({
     organization: { type: String, required: true },
     age: { type: Number, required: true },
     certificate: { type: String, required: true }
+    city: { type: String, required: true }
 }, { timestamps: true });
 
 const Applicant = mongoose.model('Applicant', applicantSchema);
