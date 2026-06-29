@@ -44,7 +44,7 @@ app.get('/admin-page', (req, res) => {
 app.post('/api/submit', async (req, res) => {
     try {
         const { name, organization, age, certificate } = req.body;
-        const newApplicant = new Applicant({ name, organization, age, certificate });
+        const newApplicant = new Applicant({ name, organization, age, certificate, city });
         await newApplicant.save();
         res.status(201).json({ success: true, message: "Information submitted successfully!" });
     } catch (error) {
